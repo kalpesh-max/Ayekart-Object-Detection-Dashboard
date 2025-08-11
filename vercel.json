@@ -7,7 +7,7 @@
       "config": {
         "distDir": "build",
         "installCommand": "npm install --force",
-        "buildCommand": "npm run build"
+        "buildCommand": "node ./node_modules/react-scripts/scripts/build.js"
       }
     }
   ],
