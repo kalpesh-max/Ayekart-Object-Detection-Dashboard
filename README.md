@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CCTV Dashboard React App
 
 A modern, responsive React dashboard for CCTV monitoring and management systems. Built with React 18, Tailwind CSS, and Lucide React icons.
@@ -241,3 +242,6 @@ For support and questions:
 ---
 
 **Built with ❤️ using React, Tailwind CSS, and Vercel**
+=======
+# Ayekart-Object-Detection-Dashboard
+>>>>>>> 94517e6c82e353f175266a2c7ccd0bd296a30814
