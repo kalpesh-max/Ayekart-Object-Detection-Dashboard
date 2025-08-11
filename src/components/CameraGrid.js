@@ -4,15 +4,12 @@ import {
   Video, 
   Wifi, 
   WifiOff, 
-  HardDrive, 
-  Play, 
-  Pause,
   Settings,
   Eye
 } from 'lucide-react';
 
 const CameraGrid = () => {
-  const { cameras, loading, updateCameraStatus } = useCameras();
+  const { cameras, loading } = useCameras();
 
   const getStatusColor = (status) => {
     switch (status) {
