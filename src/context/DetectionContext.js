@@ -1,80 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import apiClient from '../api/client';
 
 const DetectionContext = createContext();
-
-// Mock detection data
-const MOCK_DETECTIONS = [
-  {
-    id: 1,
-    camera_id: 1,
-    camera_name: 'Front Door Camera',
-    timestamp: '2024-01-15T10:30:00Z',
-    type: 'motion',
-    confidence: 0.95,
-    object_type: 'person',
-    location: 'Main Entrance',
-    image_url: '/api/detections/1/image',
-    video_url: '/api/detections/1/video'
-  },
-  {
-    id: 2,
-    camera_id: 2,
-    camera_name: 'Backyard Camera',
-    timestamp: '2024-01-15T10:25:00Z',
-    type: 'motion',
-    confidence: 0.87,
-    object_type: 'animal',
-    location: 'Garden Area',
-    image_url: '/api/detections/2/image',
-    video_url: '/api/detections/2/video'
-  },
-  {
-    id: 3,
-    camera_id: 1,
-    camera_name: 'Front Door Camera',
-    timestamp: '2024-01-15T10:20:00Z',
-    type: 'motion',
-    confidence: 0.92,
-    object_type: 'vehicle',
-    location: 'Main Entrance',
-    image_url: '/api/detections/3/image',
-    video_url: '/api/detections/3/video'
-  }
-];
-
-// Mock alerts data
-const MOCK_ALERTS = [
-  {
-    id: 1,
-    type: 'motion_detected',
-    camera_id: 1,
-    camera_name: 'Front Door Camera',
-    timestamp: '2024-01-15T10:30:00Z',
-    message: 'Motion detected at Front Door Camera',
-    severity: 'medium',
-    acknowledged: false
-  },
-  {
-    id: 2,
-    type: 'camera_offline',
-    camera_id: 3,
-    camera_name: 'Parking Lot Camera',
-    timestamp: '2024-01-15T09:45:00Z',
-    message: 'Parking Lot Camera is offline',
-    severity: 'high',
-    acknowledged: true
-  }
-];
-
-// Mock stats data
-const MOCK_STATS = {
-  total_detections: 156,
-  today_detections: 12,
-  motion_events: 89,
-  recording_time: '24h 15m',
-  storage_used: '4.6 GB',
-  system_status: 'Online'
-};
 
 export const useDetections = () => {
   const context = useContext(DetectionContext);
@@ -101,17 +28,26 @@ export const DetectionProvider = ({ children }) => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setDetections(MOCK_DETECTIONS);
-        setAlerts(MOCK_ALERTS);
-        setStats(MOCK_STATS);
+        const [detectionsRes, alertsRes, statsRes] = await Promise.all([
+          apiClient.get('/api/detections'),
+          apiClient.get('/api/alerts'),
+          apiClient.get('/api/stats')
+        ]);
+        setDetections(Array.isArray(detectionsRes.data) ? detectionsRes.data : []);
+        setAlerts(Array.isArray(alertsRes.data) ? alertsRes.data : []);
+        setStats(statsRes.data || {});
       } catch (err) {
         console.error('Failed to fetch detection data:', err);
-        // Fallback to mock data
-        setDetections(MOCK_DETECTIONS);
-        setAlerts(MOCK_ALERTS);
-        setStats(MOCK_STATS);
+        setDetections([]);
+        setAlerts([]);
+        setStats({
+          total_detections: 0,
+          today_detections: 0,
+          motion_events: 0,
+          recording_time: '0h 0m',
+          storage_used: '0 GB',
+          system_status: 'Offline'
+        });
       } finally {
         setLoading(false);
       }
@@ -124,8 +60,8 @@ export const DetectionProvider = ({ children }) => {
     setDetections(prev => [detection, ...prev]);
     setStats(prev => ({
       ...prev,
-      total_detections: prev.total_detections + 1,
-      today_detections: prev.today_detections + 1
+      total_detections: (prev.total_detections || 0) + 1,
+      today_detections: (prev.today_detections || 0) + 1
     }));
   };
 
@@ -144,11 +80,14 @@ export const DetectionProvider = ({ children }) => {
   const refreshData = async () => {
     setLoading(true);
     try {
-      // Simulate refresh
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setDetections([...MOCK_DETECTIONS]);
-      setAlerts([...MOCK_ALERTS]);
-      setStats({ ...MOCK_STATS });
+      const [detectionsRes, alertsRes, statsRes] = await Promise.all([
+        apiClient.get('/api/detections'),
+        apiClient.get('/api/alerts'),
+        apiClient.get('/api/stats')
+      ]);
+      setDetections(Array.isArray(detectionsRes.data) ? detectionsRes.data : []);
+      setAlerts(Array.isArray(alertsRes.data) ? alertsRes.data : []);
+      setStats(statsRes.data || {});
     } catch (err) {
       console.error('Failed to refresh data:', err);
     } finally {

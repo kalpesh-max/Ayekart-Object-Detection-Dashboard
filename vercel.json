@@ -9,19 +9,15 @@
         "installCommand": "npm install --force",
         "buildCommand": "node ./node_modules/react-scripts/scripts/build.js"
       }
-    }
+    },
+    { "src": "api/**/*.js", "use": "@vercel/node" }
   ],
   "routes": [
-    {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/static/(.*)", "dest": "/static/$1" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ],
   "env": {
-    "REACT_APP_API_URL": "https://your-api-endpoint.vercel.app"
+    "REACT_APP_API_URL": ""
   }
 }
